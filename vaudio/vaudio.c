@@ -109,9 +109,9 @@ s32 sceVaudio_driver_67585DFD(void)
             if (g_unk0 == '\x02')
             {
                 g_unk0 = '\0';
-                
                 s32 appType = sceKernelApplicationType();
-                if (appType == 0x100)
+                
+                if (appType == SCE_INIT_APPLICATION_VSH)
                 {
                     sceAudioSetVolumeOffset(0);
                 }
@@ -153,7 +153,7 @@ s32 sceVaudio_driver_A3B71098(s32 type, s32 arg)
                     s32 offset = g_type != '\0';
                     s32 appType = sceKernelApplicationType();
                     
-                    if (appType == 0x100)
+                    if (appType == SCE_INIT_APPLICATION_VSH)
                     {
                         sceAudioSetVolumeOffset(offset);
                     }
