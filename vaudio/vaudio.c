@@ -104,7 +104,7 @@ s32 sceVaudio_driver_67585DFD(void)
                 sceMeCore_driver_635397BB(0x126);
             }
             
-            sceAudioSetFrequency(0xac44);
+            sceAudioSetFrequency(44100);
 
             if (g_unk0 == '\x02')
             {
