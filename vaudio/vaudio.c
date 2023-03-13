@@ -26,7 +26,7 @@ s32 sceVaudioSetAlcMode(s32 mode) __attribute__((alias("sceVaudio_driver_CBD4AC5
 s32 sceVaudio_driver_A3B71098(s32 type, s32 arg);
 
 // Imports
-extern s32 sceMeCore_driver_635397BB(s32);
+extern s32 sceMeCore_driver_635397BB(s32, s32, s32);
 
 // Globals
 u8 g_unk0; // 0x0000145E
@@ -40,6 +40,15 @@ SceUID g_vaudio_fpl; // 0x00001450
 // Subroutine sub_000004D0 - Address 0x000004D0
 s32 sub_000004D0(void)
 {
+    return 0;
+}
+
+s32 sub_00000AC8(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    (void)arg0;
+    (void)arg1;
+    (void)arg2;
+    (void)arg3;
+    (void)arg4;
     return 0;
 }
 
@@ -101,7 +110,7 @@ s32 sceVaudio_driver_67585DFD(void)
             if (g_unk2 > 0)
             {
                 g_unk2 = -1;
-                sceMeCore_driver_635397BB(0x126);
+                sceMeCore_driver_635397BB(0x126, 0, 0);
             }
             
             sceAudioSetFrequency(44100);
@@ -110,7 +119,7 @@ s32 sceVaudio_driver_67585DFD(void)
             {
                 g_unk0 = '\0';
                 s32 appType = sceKernelApplicationType();
-                
+
                 if (appType == SCE_INIT_APPLICATION_VSH)
                 {
                     sceAudioSetVolumeOffset(0);
@@ -205,7 +214,19 @@ s32 sceVaudio_504E4745(void)
 }
 
 // Subroutine sceVaudio_E8E78DC8 - Address 0x0000019C
-s32 sceVaudio_E8E78DC8(void)
+s32 sceVaudio_E8E78DC8(s32 arg0, s32 arg1, s32 arg2)
 {
-    return 0;
+    s32 ret = sceKernelWaitSema(g_vaudio_sema, 1, 0);
+    if (ret >= 0)
+    {
+        ret = sceMeCore_driver_635397BB(0x124, arg1, arg0);
+        sceKernelSignalSema(g_vaudio_sema, 1);
+        
+        if (ret >= 0)
+        {
+            ret = sub_00000AC8(arg0, arg1, arg2, 1, 0x800);
+        }
+    }
+
+    return ret;
 }
