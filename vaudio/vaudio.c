@@ -79,7 +79,7 @@ s32 sceVaudioEnd(SceSize args, const void *argp)
 // Subroutine sceVaudio_driver_03B6807D - Address 0x000005BC - Aliases: sceVaudioChReserve
 s32 sceVaudio_driver_03B6807D(void)
 {
-    return 0;
+    return sub_00000AC8(0, 0, 0, 0, 0);
 }
 
 // Subroutine sceVaudio_driver_27ACC20B - Address 0x000005DC - Aliases: sceVaudioChReserveBuffering
