@@ -1,6 +1,7 @@
 #include <audio.h>
 #include <common_imp.h>
 #include <modulemgr_init.h>
+#include <sysmem_user.h>
 #include <threadman_kernel.h>
 
 SCE_MODULE_INFO("sceVaudio_driver", SCE_MODULE_KERNEL | SCE_MODULE_ATTR_EXCLUSIVE_START | SCE_MODULE_ATTR_EXCLUSIVE_LOAD, 1, 8);
@@ -36,11 +37,41 @@ u8 g_mode; // 0x00001463
 s32 g_unk2; // 0x00001466
 SceUID g_vaudio_sema; // 0x00001454
 SceUID g_vaudio_fpl; // 0x00001450
+u32 g_data; // 0x00001458
 
 // Subroutine sub_000004D0 - Address 0x000004D0
 s32 sub_000004D0(void)
 {
-    return 0;
+    u32 *data = NULL;
+    g_vaudio_sema = sceKernelCreateSema("SceVaudio", 0x101, 1, 1, 0);
+    s32 ret = g_vaudio_sema;
+    
+    if (g_vaudio_sema >= 0)
+    {
+        g_vaudio_fpl = sceKernelCreateFpl("SceVaudioWork", SCE_KERNEL_PRIMARY_USER_PARTITION, 0x100, 0xa300, 1, 0);
+        
+        if (g_vaudio_fpl < 0)
+        {
+            sceKernelDeleteSema(g_vaudio_sema);
+            ret = g_vaudio_fpl;
+        }
+        else
+        {
+            ret = sceKernelAllocateFpl(g_vaudio_fpl, (void **)&data, 0);
+            if (ret < 0)
+            {
+                sceKernelDeleteSema(g_vaudio_sema);
+                sceKernelDeleteFpl(g_vaudio_fpl);
+            }
+            else
+            {
+                g_data = data[0] | (((s32)data[0] >> 0x1f) + 2) * 0x20000000;
+                ret = 0;
+            }
+        }
+    }
+    
+    return ret;
 }
 
 s32 sub_00000AC8(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
@@ -217,6 +248,7 @@ s32 sceVaudio_504E4745(void)
 s32 sceVaudio_E8E78DC8(s32 arg0, s32 arg1, s32 arg2)
 {
     s32 ret = sceKernelWaitSema(g_vaudio_sema, 1, 0);
+    
     if (ret >= 0)
     {
         ret = sceMeCore_driver_635397BB(0x124, arg1, arg0);
