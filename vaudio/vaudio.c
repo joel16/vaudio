@@ -74,13 +74,73 @@ s32 sub_000004D0(void)
     return ret;
 }
 
-s32 sub_00000AC8(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+s32 sub_00000AC8(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4)
+{
     (void)arg0;
     (void)arg1;
     (void)arg2;
     (void)arg3;
     (void)arg4;
     return 0;
+}
+
+s32 sub_00000D84(s32 freq)
+{
+    s32 out_freq;
+    s32 ret = 3;
+    
+    if (freq != 22050)
+    {
+        if (freq < 22051)
+        {
+            if (freq == 11025)
+            {
+                return 6;
+            }
+            
+            ret = 8;
+            out_freq = 8000;
+            
+            if (freq > 11025)
+            {
+                if (freq == 12000)
+                {
+                    return 7;
+                }
+                
+                ret = 5;
+                out_freq = 16000;
+            }
+        }
+        else
+        {
+            if (freq == 32000)
+            {
+                return 2;
+            }
+            
+            ret = 4;
+            out_freq = 24000;
+            
+            if (freq > 32000)
+            {
+                if (freq == 44100)
+                {
+                    return 0;
+                }
+                
+                ret = 1;
+                out_freq = 48000;
+            }
+        }
+        
+        if (freq != out_freq)
+        {
+            ret = 0;
+        }
+    }
+    
+    return ret;
 }
 
 // Subroutine module_start - Address 0x00000670
