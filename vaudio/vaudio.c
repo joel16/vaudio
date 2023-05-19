@@ -299,9 +299,23 @@ s32 sceVaudio_driver_DCC18F25(void)
 }
 
 // Subroutine sceVaudio_504E4745 - Address 0x000005FC
-s32 sceVaudio_504E4745(void)
+s32 sceVaudio_504E4745(s32 arg0)
 {
-    return 0;
+    // SCE_ERROR_NOT_INITIALIZED
+    s32 ret = 0x80000001;
+
+    if (g_unk2 >= 0)
+    {
+        ret = SCE_ERROR_INVALID_VALUE;
+
+        if (arg0 - 1024 < 0xc01)
+        {
+            g_unk2 = (short)arg0;
+            ret = 0;
+        }
+    }
+    
+    return ret;
 }
 
 // Subroutine sceVaudio_E8E78DC8 - Address 0x0000019C
