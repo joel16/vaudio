@@ -235,7 +235,7 @@ s32 sceVaudio_driver_8986295E(void)
 // Subroutine sceVaudio_driver_A3B71098 - Address 0x00000350
 s32 sceVaudio_driver_A3B71098(s32 type, s32 arg)
 {
-    s32 ret = 0x80000102;
+    s32 ret = SCE_ERROR_INVALID_INDEX;
 
     if (type < SCE_VAUDIO_TYPE_MAX)
     {
