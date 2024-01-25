@@ -1,30 +1,18 @@
+/* Copyright (C) 2024 The uOFW team
+   See the file COPYING for copying permission.
+*/
+
 #include <audio.h>
 #include <common_imp.h>
 #include <modulemgr_init.h>
 #include <sysmem_user.h>
 #include <threadman_kernel.h>
+#include "vaudio.h"
 
 SCE_MODULE_INFO("sceVaudio_driver", SCE_MODULE_KERNEL | SCE_MODULE_ATTR_EXCLUSIVE_START | SCE_MODULE_ATTR_EXCLUSIVE_LOAD, 1, 8);
 SCE_MODULE_BOOTSTART("sceVaudioInit");
 SCE_MODULE_STOP("sceVaudioEnd");
 SCE_SDK_VERSION(SDK_VERSION);
-
-// VAUDIO Types
-#define SCE_VAUDIO_TYPE_MAX 5
-
-// VAUDIO ALC modes
-#define SCE_VAUDIO_ALC_MODE_OFF  0
-#define SCE_VAUDIO_ALC_MODE_ON   1
-#define SCE_VAUDIO_ALC_MODE_MAX  2
-
-// Prototypes and aliases
-s32 sceVaudioChReserve(s32 channel, s32 sampleCount, s32 format) __attribute__((alias("sceVaudio_driver_03B6807D")));
-s32 sceVaudioChReserveBuffering(s32 channel, s32 sampleCount, s32 format) __attribute__((alias("sceVaudio_driver_27ACC20B")));
-s32 sceVaudioSetEffectType(s32 type) __attribute__((alias("sceVaudio_driver_346FBE94")));
-s32 sceVaudioChRelease(void) __attribute__((alias("sceVaudio_driver_67585DFD")));
-s32 sceVaudioOutputBlocking(void) __attribute__((alias("sceVaudio_driver_8986295E")));
-s32 sceVaudioSetAlcMode(s32 mode) __attribute__((alias("sceVaudio_driver_CBD4AC51")));
-s32 sceVaudio_driver_A3B71098(s32 type, s32 arg);
 
 // Imports
 extern s32 sceMeCore_driver_635397BB(s32, s32 sampleCount, s32 channel);
@@ -84,57 +72,57 @@ s32 sub_00000AC8(s32 channel, s32 sampleCount, s32 format, s32 arg3, s32 arg4)
     return 0;
 }
 
-s32 sub_00000D84(s32 freq)
+s32 sub_00000D84(s32 sampleCount)
 {
-    s32 out_freq;
+    s32 freq;
     s32 ret = 3;
     
-    if (freq != 22050)
+    if (sampleCount != 22050)
     {
-        if (freq < 22051)
+        if (sampleCount < 22051)
         {
-            if (freq == 11025)
+            if (sampleCount == 11025)
             {
                 return 6;
             }
             
             ret = 8;
-            out_freq = 8000;
+            freq = 8000;
             
-            if (freq > 11025)
+            if (sampleCount > 11025)
             {
-                if (freq == 12000)
+                if (sampleCount == 12000)
                 {
                     return 7;
                 }
                 
                 ret = 5;
-                out_freq = 16000;
+                freq = 16000;
             }
         }
         else
         {
-            if (freq == 32000)
+            if (sampleCount == 32000)
             {
                 return 2;
             }
             
             ret = 4;
-            out_freq = 24000;
+            freq = 24000;
             
-            if (freq > 32000)
+            if (sampleCount > 32000)
             {
-                if (freq == 44100)
+                if (sampleCount == 44100)
                 {
                     return 0;
                 }
                 
                 ret = 1;
-                out_freq = 48000;
+                freq = 48000;
             }
         }
         
-        if (freq != out_freq)
+        if (sampleCount != freq)
         {
             ret = 0;
         }
@@ -168,25 +156,25 @@ s32 sceVaudioEnd(SceSize args, const void *argp)
 }
 
 // Subroutine sceVaudio_driver_03B6807D - Address 0x000005BC - Aliases: sceVaudioChReserve
-s32 sceVaudio_driver_03B6807D(s32 channel, s32 sampleCount, s32 format)
+s32 sceVaudioChReserve(s32 channel, s32 sampleCount, s32 format)
 {
     return sub_00000AC8(channel, sampleCount, format, 0, -1);
 }
 
 // Subroutine sceVaudio_driver_27ACC20B - Address 0x000005DC - Aliases: sceVaudioChReserveBuffering
-s32 sceVaudio_driver_27ACC20B(s32 channel, s32 sampleCount, s32 format)
+s32 sceVaudioChReserveBuffering(s32 channel, s32 sampleCount, s32 format)
 {
     return sub_00000AC8(channel, sampleCount, format, 1, -1);
 }
 
 // Subroutine sceVaudio_driver_346FBE94 - Address 0x00000638 - Aliases: sceVaudioSetEffectType
-s32 sceVaudio_driver_346FBE94(s32 type)
+s32 sceVaudioSetEffectType(s32 type)
 {
     return sceVaudio_driver_A3B71098(type, 0);
 }
 
 // Subroutine sceVaudio_driver_67585DFD - Address 0x00000264 - Aliases: sceVaudioChRelease
-s32 sceVaudio_driver_67585DFD(void)
+s32 sceVaudioChRelease(void)
 {
     s32 ret = 0;
     ret = sceKernelWaitSema(g_vaudio_sema, 1, 0);
@@ -227,7 +215,7 @@ s32 sceVaudio_driver_67585DFD(void)
 }
 
 // Subroutine sceVaudio_driver_8986295E - Address 0x00000000 - Aliases: sceVaudioOutputBlocking
-s32 sceVaudio_driver_8986295E(void)
+s32 sceVaudioOutputBlocking(void)
 {
     return 0;
 }
@@ -269,7 +257,7 @@ s32 sceVaudio_driver_A3B71098(s32 type, s32 arg)
 }
 
 // Subroutine sceVaudio_driver_CBD4AC51 - Address 0x00000434 - Aliases: sceVaudioSetAlcMode
-s32 sceVaudio_driver_CBD4AC51(s32 mode)
+s32 sceVaudioSetAlcMode(s32 mode)
 {
     s32 ret = SCE_ERROR_INVALID_INDEX;
 
