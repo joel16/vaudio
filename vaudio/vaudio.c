@@ -72,63 +72,30 @@ s32 sub_00000AC8(s32 channel, s32 sampleCount, s32 format, s32 arg3, s32 arg4)
     return 0;
 }
 
-s32 sub_00000D84(s32 sampleCount)
+s32 sub_00000D84(s32 freq)
 {
-    s32 freq;
-    s32 ret = 3;
-    
-    if (sampleCount != 22050)
-    {
-        if (sampleCount < 22051)
-        {
-            if (sampleCount == 11025)
-            {
-                return 6;
-            }
-            
-            ret = 8;
-            freq = 8000;
-            
-            if (sampleCount > 11025)
-            {
-                if (sampleCount == 12000)
-                {
-                    return 7;
-                }
-                
-                ret = 5;
-                freq = 16000;
-            }
-        }
-        else
-        {
-            if (sampleCount == 32000)
-            {
-                return 2;
-            }
-            
-            ret = 4;
-            freq = 24000;
-            
-            if (sampleCount > 32000)
-            {
-                if (sampleCount == 44100)
-                {
-                    return 0;
-                }
-                
-                ret = 1;
-                freq = 48000;
-            }
-        }
-        
-        if (sampleCount != freq)
-        {
-            ret = 0;
-        }
+    switch (freq) {
+        case 8000:
+            return 8;
+        case 11025:
+            return 6;
+        case 12000:
+            return 7;
+        case 16000:
+            return 5;
+        case 22050:
+            return 3;
+        case 24000:
+            return 4;
+        case 32000:
+            return 2;
+        case 44100:
+            return 0;
+        case 48000:
+            return 1;
     }
-    
-    return ret;
+
+    return 0;
 }
 
 // Subroutine module_start - Address 0x00000670
