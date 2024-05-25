@@ -112,7 +112,7 @@ s32 sceVaudioEnd(SceSize args, const void *argp)
     (void)args;
     (void)argp;
     
-    if (g_unk1 != '\0')
+    if (g_unk1 != 0)
     {
         sceVaudioChRelease();
     }
@@ -161,9 +161,9 @@ s32 sceVaudioChRelease(void)
             
             sceAudioSetFrequency(44100);
 
-            if (g_unk0 == '\x02')
+            if (g_unk0 == 2)
             {
-                g_unk0 = '\0';
+                g_unk0 = 0;
                 s32 appType = sceKernelApplicationType();
 
                 if (appType == SCE_INIT_APPLICATION_VSH)
@@ -205,7 +205,7 @@ s32 sceVaudio_driver_A3B71098(s32 type, s32 arg)
                 s32 samples = sceAudioOutput2GetRestSample();
                 if (samples < 1)
                 {
-                    s32 offset = g_type != '\0';
+                    s32 offset = g_type != 0;
                     s32 appType = sceKernelApplicationType();
                     
                     if (appType == SCE_INIT_APPLICATION_VSH)
